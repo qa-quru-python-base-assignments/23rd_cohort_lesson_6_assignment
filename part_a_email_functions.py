@@ -2,7 +2,7 @@ import re
 from datetime import date
 
 
-def normalize_addresses(value: str) -> str:
+def normalize_address(value: str) -> str:
     """
     Возвращает значение, в котором адрес приведен к нижнему регистру и очищен от пробелов по краям.
     """
@@ -34,14 +34,12 @@ def build_sent_text(email: dict) -> str:
     Тема: {subject}, дата {date}
     {clean_body}
     """
-    recipient = normalize_addresses(email['to'])
-    sender = normalize_addresses(email['from'])
+    recipient = normalize_address(email['recipient'])
+    sender = normalize_address(email['sender'])
     subject = email['subject']
     # берем дату из словаря письма, если ее нет - используем сегодняшнюю
-    send_date = email.get(
-        "date",
-        date.today().strftime("%Y-%m-%d")
-    )
+    send_date = email['date']
+
     clean_body = clean_body_text(email["body"])
 
     return (
@@ -75,7 +73,7 @@ def get_correct_email(email_list: list[str]) -> list[str]:
     correct_emails = []
     email_re = re.compile(r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|ru|net)$')
     for email in email_list:
-        normalized_email = normalize_addresses(email)
+        normalized_email = normalize_address(email)
         if email_re.fullmatch(normalized_email):
             correct_emails.append(email)  # добавляем в ненормализованном виде
     return correct_emails
